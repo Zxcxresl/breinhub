@@ -1,10 +1,13 @@
--- Brein Hub Parte 2: Logo + Menú moderno
+-- Brein Hub - Parte 2 (Menu flotante + pestañas + carga Parte 3)
+
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 local gui = game:GetService("CoreGui"):FindFirstChild("BreinHub_UI") or Instance.new("ScreenGui", gethui and gethui() or lp:WaitForChild("PlayerGui"))
 gui.Name = "BreinHub_UI"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
 
--- Logo animado en centro de pantalla
+-- Logo animado en pantalla
 local logoFrame = Instance.new("TextLabel", gui)
 logoFrame.Text = "💠 Brein Hub 💠"
 logoFrame.Size = UDim2.new(1, 0, 1, 0)
@@ -12,10 +15,11 @@ logoFrame.TextScaled = true
 logoFrame.BackgroundTransparency = 1
 logoFrame.TextColor3 = Color3.fromRGB(0, 170, 255)
 logoFrame.Font = Enum.Font.GothamBlack
+
 game:GetService("TweenService"):Create(logoFrame, TweenInfo.new(1), {TextTransparency = 0}):Play()
-wait(2)
+task.wait(2)
 game:GetService("TweenService"):Create(logoFrame, TweenInfo.new(1), {TextTransparency = 1}):Play()
-wait(1)
+task.wait(1)
 logoFrame:Destroy()
 
 -- Contenedor del menú
@@ -27,6 +31,7 @@ mainUI.BorderColor3 = Color3.fromRGB(0, 170, 255)
 mainUI.BorderSizePixel = 1
 mainUI.Active = true
 mainUI.Draggable = true
+mainUI.Name = "BreinHub_Window"
 
 -- Barra superior
 local titleBar = Instance.new("Frame", mainUI)
@@ -44,13 +49,13 @@ titleText.Size = UDim2.new(1, 0, 1, 0)
 titleText.TextXAlignment = Enum.TextXAlignment.Left
 titleText.Position = UDim2.new(0, 10, 0, 0)
 
--- Minimizar / Ocultar
+-- Botón cerrar/ocultar
 local closeBtn = Instance.new("TextButton", titleBar)
 closeBtn.Size = UDim2.new(0, 30, 1, 0)
 closeBtn.Position = UDim2.new(1, -35, 0, 0)
 closeBtn.Text = "×"
 closeBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
-closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 18
 
@@ -58,6 +63,7 @@ closeBtn.MouseButton1Click:Connect(function()
 	mainUI.Visible = false
 end)
 
+-- Botón flotante (≡)
 local showBtn = Instance.new("TextButton", gui)
 showBtn.Text = "≡"
 showBtn.Size = UDim2.new(0, 40, 0, 40)
@@ -96,10 +102,11 @@ local function createTab(name)
 	frame.Position = UDim2.new(0, 120, 0, 40)
 	frame.BackgroundTransparency = 1
 	frame.Visible = false
+	frame.Name = name .. "_Tab"
 
 	btn.MouseButton1Click:Connect(function()
 		for _, f in pairs(tabFrames) do f.Visible = false end
-		for _, b in pairs(tabButtons) do b.BackgroundColor3 = Color3.fromRGB(15,15,15) end
+		for _, b in pairs(tabButtons) do b.BackgroundColor3 = Color3.fromRGB(15, 15, 15) end
 		btn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 		frame.Visible = true
 	end)
@@ -110,12 +117,17 @@ local function createTab(name)
 	return frame
 end
 
--- Crear secciones principales
-local mainTab = createTab("Main")
-local combatTab = createTab("Combat")
-local motionTab = createTab("Motion")
-local infoTab = createTab("Info")
-local serverTab = createTab("Server")
+-- Crear pestañas principales
+_G.BreinTabs = {
+	Main = createTab("Main"),
+	Combat = createTab("Combat"),
+	Motion = createTab("Motion"),
+	Info = createTab("Info"),
+	Server = createTab("Server"),
+}
 
--- Activar primero por defecto
+-- Activar pestaña principal por defecto
 tabButtons[1].MouseButton1Click:Fire()
+
+-- Cargar Parte 3 automáticamente
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zxcxresl/breinhub/main/part3.lua"))()
