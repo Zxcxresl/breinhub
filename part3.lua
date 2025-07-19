@@ -1,3 +1,8 @@
+-- ✅ Parte 3: Funciones + seguridad de carga
+
+-- Esperar pestañas desde parte 2
+repeat task.wait() until _G.BreinTabs and _G.BreinTabs.Main
+
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 local RunService = game:GetService("RunService")
@@ -5,15 +10,30 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local MarketplaceService = game:GetService("MarketplaceService")
 
--- Referencias a pestañas desde Parte 2
+local gui = game:GetService("CoreGui"):FindFirstChild("BreinHub_UI")
+
+-- Notificación visual al cargar
+local notif = Instance.new("TextLabel", gui)
+notif.Size = UDim2.new(0, 300, 0, 30)
+notif.Position = UDim2.new(1, -310, 1, -40)
+notif.Text = "✅ BreinHub cargado correctamente"
+notif.TextColor3 = Color3.fromRGB(0, 170, 255)
+notif.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+notif.Font = Enum.Font.GothamBold
+notif.TextScaled = true
+notif.BorderSizePixel = 0
+task.delay(3, function() notif:Destroy() end)
+
+warn("✅ BreinHub Part 3 cargado con éxito.")
+
+-- Referencias a pestañas
 local mainTab = _G.BreinTabs.Main
 local combatTab = _G.BreinTabs.Combat
 local motionTab = _G.BreinTabs.Motion
 local infoTab = _G.BreinTabs.Info
 local serverTab = _G.BreinTabs.Server
-local gui = game:GetService("CoreGui"):FindFirstChild("BreinHub_UI")
 
--- Utilidad para botones
+-- Función rápida para botones
 local function createButton(parent, text, callback)
 	local btn = Instance.new("TextButton", parent)
 	btn.Size = UDim2.new(0, 480, 0, 30)
@@ -25,7 +45,7 @@ local function createButton(parent, text, callback)
 	btn.BorderColor3 = Color3.fromRGB(0, 170, 255)
 	btn.AutoButtonColor = true
 	btn.MouseButton1Click:Connect(callback)
-	return btn
+	btn.Parent = parent
 end
 
 -- 📍 MAIN
@@ -47,7 +67,7 @@ createButton(mainTab, "🚀 Ir al Checkpoint", function()
 	end
 end)
 
--- Botón flotante "Ir" en pantalla
+-- Botón "Ir" flotante
 local gotoBtn = Instance.new("TextButton", gui)
 gotoBtn.Size = UDim2.new(0, 60, 0, 25)
 gotoBtn.Position = UDim2.new(1, -70, 0.5, -100)
@@ -65,8 +85,7 @@ gotoBtn.MouseButton1Click:Connect(function()
 end)
 
 createButton(mainTab, "🛰️ Teleport a jugador aleatorio", function()
-	local players = Players:GetPlayers()
-	for _, plr in pairs(players) do
+	for _, plr in pairs(Players:GetPlayers()) do
 		if plr ~= lp and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
 			lp.Character:PivotTo(plr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0))
 			break
@@ -82,8 +101,6 @@ end)
 createButton(mainTab, "🔧 Próximamente...", function() end)
 
 -- ⚔️ COMBAT
-
--- ESP
 local espEnabled = false
 local espColor = Color3.fromRGB(0, 170, 255)
 
@@ -118,7 +135,7 @@ createButton(combatTab, "👁️ Toggle ESP", function()
 	end
 end)
 
--- Aimbot (carga externa)
+-- Aimbot externo
 createButton(combatTab, "🎯 Activar Aimbot", function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Zxcxresl/aimbotzxcz/main/aim.lua"))()
 end)
